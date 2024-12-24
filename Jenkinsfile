@@ -17,10 +17,6 @@ pipeline {
                 // Add Python and Scripts directory to PATH
                 bat '''set PATH=%PATH%;C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37;C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37\\Scripts'''
                 
-                // Verify that Python and pip are available
-                bat 'python --version'
-                bat 'pip --version'
-                
                 // Run the build script
                 bat './build.bat'
             }

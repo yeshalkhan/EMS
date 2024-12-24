@@ -14,6 +14,8 @@ pipeline {
 
         stage('Build') {
             steps {
+		bat 'echo %cd%'  
+		bat 'echo %PATH%'
                 bat './build.bat'
             }
         }

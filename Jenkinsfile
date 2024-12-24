@@ -14,8 +14,7 @@ pipeline {
 
         stage('Build') {
             steps {
-		bat 'echo %cd%'  
-		bat 'echo %PATH%'
+		bat 'set PATH=%PATH%;C:\Users\computer point\AppData\Local\Programs\Python\Python37\Scripts;C:\Users\computer point\AppData\Local\Programs\Python\Python37'  
                 bat './build.bat'
             }
         }

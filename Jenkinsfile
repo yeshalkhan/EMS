@@ -14,7 +14,11 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'set PATH=%PATH%;C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37\\Scripts;C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37'  
+                bat 'set PATH=%PATH%;C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37\\Scripts'  
+                
+                bat 'python --version'
+                bat 'pip --version'
+                
                 bat './build.bat'
             }
         }

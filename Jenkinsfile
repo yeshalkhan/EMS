@@ -14,10 +14,8 @@ pipeline {
 
         stage('Build') {
             steps {
-                // You can also ensure Python is available by printing the version
                 bat '"C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37\\python.exe" --version'
                 
-                // Call build.bat
                 bat './build.bat'
             }
         }

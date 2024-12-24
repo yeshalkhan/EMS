@@ -1,8 +1,8 @@
-# EMS 2.0 CI/CD Pipeline Documentation
+# EMS CI/CD Pipeline Documentation
 
 ## Overview
 
-This repository contains the Continuous Integration and Continuous Deployment (CI/CD) pipeline for the **EMS 2.0** project. The pipeline is set up using **Jenkins**, and it automates the process of building, testing, and deploying the application. This document outlines the steps to run the pipeline and troubleshooting tips for common issues.
+This repository contains the Continuous Integration and Continuous Deployment (CI/CD) pipeline for the **EMS** project. The pipeline is set up using **Jenkins**, and it automates the process of building, testing, and deploying the application. This document outlines the steps to run the pipeline and troubleshooting tips for common issues.
 
 ---
 

@@ -14,14 +14,10 @@ pipeline {
 
         stage('Build') {
             steps {
-                // Directly use the full path for python and pip
-                bat '''"C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37\\python.exe" --version'''
-                bat '''"C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37\\Scripts\\pip.exe" --version'''
-
-                // Install dependencies using the absolute path for pip
-                bat '''"C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37\\Scripts\\pip.exe" install -r requirements.txt'''
+                // You can also ensure Python is available by printing the version
+                bat '"C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37\\python.exe" --version'
                 
-                // Run the build script
+                // Call build.bat
                 bat './build.bat'
             }
         }

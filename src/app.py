@@ -52,7 +52,7 @@ def login():
 
 # Voter Registration
 @app.route('/register_voter', methods=['POST'])
-@admin_required
+# @admin_required
 def register_voter():
     data = request.json
     name = data.get('name')

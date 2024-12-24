@@ -14,8 +14,12 @@ pipeline {
 
         stage('Build') {
             steps {
-                // Add Python and Scripts directory to PATH
-                bat '''set PATH=%PATH%;C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37;C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37\\Scripts'''
+                // Directly use the full path for python and pip
+                bat '''"C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37\\python.exe" --version'''
+                bat '''"C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37\\Scripts\\pip.exe" --version'''
+
+                // Install dependencies using the absolute path for pip
+                bat '''"C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37\\Scripts\\pip.exe" install -r requirements.txt'''
                 
                 // Run the build script
                 bat './build.bat'

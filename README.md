@@ -1,4 +1,4 @@
-# EMS 2.0 CI/CD Pipeline Documentation
+# EMS CI/CD Pipeline Documentation
 
 ## Overview
 

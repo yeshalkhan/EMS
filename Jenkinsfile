@@ -1,25 +1,24 @@
 pipeline {
     agent any
-    
+
     environment {
-        GITHUB_CREDENTIALS = credentials('my-repo-credentials')  
+        GITHUB_CREDENTIALS = credentials('my-repo-credentials')
     }
-    
+
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'my-repo-credentials', url: 'https://github.com/yeshalkhan/EMS'
+                git credentialsId: 'my-repo-credentials', url: 'https://github.com/yeshalkhan/EMS', branch: 'main'
             }
         }
-        
+
         stage('Build') {
             steps {
                 sh './build.sh'
             }
         }
-        
     }
-    
+
     post {
         always {
             echo 'Pipeline execution finished!'

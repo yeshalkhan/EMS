@@ -50,7 +50,6 @@ def login():
     
     return format_response(False, "Invalid credentials")
 
-# Voter Registration
 @app.route('/register_voter', methods=['POST'])
 @admin_required
 def register_voter():

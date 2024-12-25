@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository contains the Continuous Integration and Continuous Deployment (CI/CD) pipeline for the **EMS** project. The pipeline is set up using **Jenkins**, and it automates the process of building, testing, and deploying the application. This document outlines the steps to run the pipeline and troubleshooting tips for common issues.
+This repository contains the Continuous Integration and Continuous Deployment (CI/CD) pipeline for the **EMS** project. The pipeline is set up using **Jenkins**, and it automates the process of building and testing the application. This document outlines the steps to run the pipeline and troubleshooting tips for common issues.
 
 ---
 
@@ -16,8 +16,6 @@ The pipeline is designed to perform the following stages:
    - Dependencies from the `requirements.txt` file are installed using `pip`.
 3. **Test**:
    - The project is tested using **pytest**. Any failing tests will cause the pipeline to fail.
-4. **Deploy**:
-   - The application is deployed to the server using the deployment script (`deploy.sh`), which copies files to the target environment and restarts services.
 
 These stages are defined in the `Jenkinsfile` located at the root of the repository.
 
@@ -55,9 +53,3 @@ These stages are defined in the `Jenkinsfile` located at the root of the reposit
 ## Additional Information
 
 For more detailed information on setting up and managing Jenkins pipelines, refer to the [Jenkins documentation](https://www.jenkins.io/doc/).
-
----
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

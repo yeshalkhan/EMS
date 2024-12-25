@@ -142,7 +142,7 @@ def test_get_candidates(client):
     candidate_id = mongo.db.candidates.insert_one({
         "name": "alizay",
         "party": "A",
-        "cnic": "67890",
+        "cnic": "55555",
         "dob": "1990-01-01"
     }).inserted_id
     with client.session_transaction() as sess:
@@ -158,7 +158,7 @@ def test_create_election(client):
     candidate_id = mongo.db.candidates.insert_one({
         "name": "alizay",
         "party": "A",
-        "cnic": "67890",
+        "cnic": "55555",
         "dob": "1990-01-01"
     }).inserted_id
 
@@ -186,7 +186,7 @@ def test_edit_election(client):
     candidate_id = mongo.db.candidates.insert_one({
         "name": "alizay",
         "party": "A",
-        "cnic": "67890",
+        "cnic": "55555",
         "dob": "1990-01-01"
     }).inserted_id
 

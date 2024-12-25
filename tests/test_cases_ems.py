@@ -8,7 +8,8 @@ from flask import session
 from datetime import datetime
 from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
-from dateutil.parser import isoparse  # Import to handle ISO 8601 format with 'Z'
+from dateutil.parser import isoparse
+from datetime import datetime
 
 # Create a fixture to initialize the Flask app and MongoDB
 @pytest.fixture
@@ -153,12 +154,25 @@ def test_get_candidates(client):
     mongo.db.candidates.delete_one({"_id": candidate_id})  # Clean up
 
 # Election Management
+
+def clean_date_string(date_str):
+    # Remove the weekday and the 'GMT' part of the date string
+    # Example: 'Thu, 12 Dec 2024 11:53:00 GMT' -> '2024-12-12T11:53:00.000Z'
+    try:
+        date_str = date_str.split(', ')[1]  # Remove the weekday part
+        date_str = date_str.split(' GMT')[0]  # Remove ' GMT' part
+        date_str = f"{date_str}Z"  # Add the 'Z' to represent UTC timezone
+        return isoparse(date_str)  # Now parse it using isoparse
+    except Exception as e:
+        print(f"Error in cleaning date string: {e}")
+        return None
+
 def test_create_election(client):
     client, mongo = client  # Get client and mongo from fixture
     candidate_id = mongo.db.candidates.insert_one({
         "name": "alizay",
         "party": "A",
-        "cnic": "66666",
+        "cnic": "55555",
         "dob": "1990-01-01"
     }).inserted_id
 
@@ -168,20 +182,20 @@ def test_create_election(client):
     # Clean up: Ensure no conflicting elections exist
     mongo.db.elections.delete_many({})
 
-    try:
-        response = client.post('/create_election', json={
-            "name": "pti election",
-            "start_date": isoparse("2024-12-12T11:53:00.000Z"),  # Correct date format
-            "end_date": isoparse("2024-12-24T01:54:00.000Z"),  # Correct date format
-            "candidate_ids": [str(candidate_id)]
-        })
-        print("Create election response:", response.json)
-        assert response.json['success'] == True
-    finally:
-        # Clean up the test data after assertions to ensure no data is left
-        mongo.db.elections.delete_one({"name": "pti election"})
-        mongo.db.candidates.delete_one({"_id": candidate_id})  # Clean up candidate
+    # Clean up and convert the date to ISO 8601 format first
+    start_date = clean_date_string("Thu, 12 Dec 2024 11:53:00 GMT")
+    end_date = clean_date_string("Thu, 24 Dec 2024 01:54:00 GMT")
 
+    response = client.post('/create_election', json={
+        "name": "pti election",
+        "start_date": start_date,  # Now passed as a datetime object
+        "end_date": end_date,  # Now passed as a datetime object
+        "candidate_ids": [str(candidate_id)]
+    })
+    print("Create election response:", response.json)
+    assert response.json['success'] == True
+    mongo.db.elections.delete_one({"name": "pti election"})  # Clean up
+    mongo.db.candidates.delete_one({"_id": candidate_id})  # Clean up
 
 def test_edit_election(client):
     client, mongo = client  # Get client and mongo from fixture
@@ -190,15 +204,15 @@ def test_edit_election(client):
     candidate_id = mongo.db.candidates.insert_one({
         "name": "alizay",
         "party": "A",
-        "cnic": "66666",
+        "cnic": "55555",
         "dob": "1990-01-01"
     }).inserted_id
 
     # Insert an election
     election_id = mongo.db.elections.insert_one({
         "name": "pti election",
-        "start_date": isoparse("2024-12-12T11:53:00.000Z"),  # Correct format for start_date
-        "end_date": isoparse("2024-12-24T01:54:00.000Z"),  # Correct format for end_date
+        "start_date": clean_date_string("Thu, 12 Dec 2024 11:53:00 GMT"),
+        "end_date": clean_date_string("Thu, 24 Dec 2024 01:54:00 GMT"),
         "candidates": [{"_id": candidate_id, "name": "alizay", "party": "A"}],
         "votes": {}
     }).inserted_id
@@ -210,21 +224,22 @@ def test_edit_election(client):
     election = mongo.db.elections.find_one({"_id": election_id})
     assert election is not None, "Election was not found in the database before edit."
 
-    # Attempt to edit the election with new data
+    # Attempt to edit the election
+    start_date = clean_date_string("Thu, 12 Dec 2024 11:53:00 GMT")
+    end_date = clean_date_string("Thu, 24 Dec 2024 01:54:00 GMT")
+
     try:
         response = client.put(f'/edit_election/{str(election_id)}', json={
             "name": "updated election",
-            "start_date": isoparse("2024-12-12T11:53:00.000Z"),  # Correct format for start_date
-            "end_date": isoparse("2024-12-24T01:54:00.000Z"),  # Correct format for end_date
-            "candidate_ids": [str(candidate_id)]  # Make sure the candidate ID is passed as a string
+            "start_date": start_date,
+            "end_date": end_date,
+            "candidate_ids": [str(candidate_id)]
         })
         print("Edit election response:", response.json)
 
         # Assert that the response indicates success
         assert response.json['success'] == True
-
     finally:
         # Clean up the test data after assertions
         mongo.db.elections.delete_one({"_id": election_id})  # Delete the election
         mongo.db.candidates.delete_one({"_id": candidate_id})  # Clean up candidate
-

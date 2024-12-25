@@ -170,7 +170,7 @@ def test_create_election(client):
 
     response = client.post('/create_election', json={
         "name": "pti election",
-         "start_date": isoparse("2024-12-12T11:53:00.000Z"),  # Use isoparse here
+        "start_date": isoparse("2024-12-12T11:53:00.000Z"),  # Use isoparse here
         "end_date": isoparse("2024-12-24T01:54:00.000Z"),  # Use isoparse here
         "candidate_ids": [str(candidate_id)]
     })

@@ -3,6 +3,7 @@ from flask_pymongo import PyMongo
 from datetime import datetime
 from functools import wraps
 from bson.objectid import ObjectId
+from dateutil.parser import isoparse
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -109,8 +110,8 @@ def get_candidates():
 def create_election():
     data = request.json
     name = data.get('name')
-    start_date = datetime.fromisoformat(data.get('start_date'))
-    end_date = datetime.fromisoformat(data.get('end_date'))
+    start_date = isoparse(data.get('start_date'))  # Use isoparse here
+    end_date = isoparse(data.get('end_date'))  # Use isoparse here
     candidate_ids = data.get('candidate_ids')
 
     if start_date >= end_date:
@@ -147,8 +148,8 @@ def create_election():
 def edit_election(election_id):
     data = request.json
     name = data.get('name')
-    start_date = datetime.fromisoformat(data.get('start_date'))
-    end_date = datetime.fromisoformat(data.get('end_date'))
+    start_date = isoparse(data.get('start_date'))  # Use isoparse here
+    end_date = isoparse(data.get('end_date'))  # Use isoparse here
     candidate_ids = data.get('candidate_ids')
 
     if start_date >= end_date:

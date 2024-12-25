@@ -19,6 +19,11 @@ pipeline {
                 bat './build.bat'
             }
         }
+	stage('Test') {
+            steps {
+                bat '"C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37\\python.exe" -m pytest tests/'
+            }
+        }
     }
 
     post {

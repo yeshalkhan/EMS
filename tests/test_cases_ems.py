@@ -9,6 +9,7 @@ from datetime import datetime
 from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
 
+# Create a fixture to initialize the Flask app and MongoDB
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
@@ -20,7 +21,7 @@ def client():
     with app.test_client() as client:
         with app.app_context():
             yield client, mongo  # Pass both client and mongo to the tests
-
+    
 # UNIT TESTS
 def test_format_response():
     with app.app_context():
@@ -51,6 +52,9 @@ def test_admin_required_decorator():
     assert result == "Admin Protected"
 
 # INTEGRATION TESTS - Authentication
+
+# Failed test:
+'''
 def test_login_voter(client):
     client, mongo = client  # Get client and mongo from fixture
     # Insert a test voter
@@ -67,6 +71,25 @@ def test_login_voter(client):
     })
     print("Login response:", response.json)
     assert response.json['success'] == True
+    mongo.db.voters.delete_one({"cnic": "987654321"})  # Clean up
+'''
+
+def test_login_voter(client):
+    client, mongo = client # Get client and mongo from fixture
+    # Insert a test voter
+    mongo.db.voters.insert_one({
+        "name": "Marwa",
+        "cnic": "987654321",
+        "dob": "2000-07-07",
+        "age": 34,
+        "voted": False
+    })
+    response = client.post('/login', json={
+        "cnic": "987654321",
+        "dob": "2000-07-07"
+    })
+    print("Login response:", response.json)
+    assert response.json['success'] is True
     mongo.db.voters.delete_one({"cnic": "987654321"})  # Clean up
 
 def test_login_admin(client):
@@ -141,6 +164,9 @@ def test_get_candidates(client):
     mongo.db.candidates.delete_one({"_id": candidate_id})  # Clean up
 
 # Election Management
+
+# Failed test:
+'''
 def test_create_election(client):
     client, mongo = client  # Get client and mongo from fixture
     candidate_id = mongo.db.candidates.insert_one({
@@ -164,6 +190,33 @@ def test_create_election(client):
     })
     print("Create election response:", response.json)
     assert response.json['success'] == True
+    mongo.db.elections.delete_one({"name": "pti election"})  # Clean up
+    mongo.db.candidates.delete_one({"_id": candidate_id})  # Clean up
+'''
+
+def test_create_election(client):
+    client, mongo = client # Get client and mongo from fixture
+    candidate_id = mongo.db.candidates.insert_one({
+        "name": "alizay",
+        "party": "A",
+        "cnic": "67890",
+        "dob": "1990-01-01"
+    }).inserted_id
+
+    with client.session_transaction() as sess:
+        sess['user'] = {"id": "admin123", "role": "admin"}
+
+    # Clean up: Ensure no conflicting elections exist
+    mongo.db.elections.delete_many({})
+
+    response = client.post('/create_election', json={
+        "name": "pti election",
+        "start_date": "2024-12-12T11:53:00".replace("Z", ""),
+        "end_date": "2024-12-24T01:54:00".replace("Z", ""),
+        "candidate_ids": [str(candidate_id)]
+    })
+    print("Create election response:", response.json)
+    assert response.json['success'] == True    
     mongo.db.elections.delete_one({"name": "pti election"})  # Clean up
     mongo.db.candidates.delete_one({"_id": candidate_id})  # Clean up
 

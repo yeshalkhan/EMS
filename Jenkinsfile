@@ -26,7 +26,7 @@ pipeline {
             echo 'Pipeline execution finished!'
         }
         success {
-            echo 'Build, Test, and Deployment Successful!'
+            echo 'Build and Test Successful!'
         }
         failure {
             echo 'An error occurred during execution.'

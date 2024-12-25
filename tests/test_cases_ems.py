@@ -11,6 +11,20 @@ from flask_pymongo import PyMongo
 from dateutil.parser import isoparse
 from datetime import datetime
 
+def clean_date_string(date_str):
+    # Remove the weekday part (e.g., 'Thu, ') and ' GMT' suffix
+    try:
+        # Remove the weekday part by splitting the string at the comma and taking the second part
+        date_str = date_str.split(', ')[1]  
+        # Remove ' GMT' from the string to make it compatible with isoparse
+        date_str = date_str.replace(' GMT', '')  
+        # Add 'Z' at the end to indicate the UTC timezone
+        date_str = f"{date_str}Z"  
+        return isoparse(date_str)  # Parse the cleaned-up string into a datetime object
+    except Exception as e:
+        print(f"Error in cleaning date string: {e}")
+        return None
+    
 # Create a fixture to initialize the Flask app and MongoDB
 @pytest.fixture
 def client():
@@ -154,19 +168,6 @@ def test_get_candidates(client):
     mongo.db.candidates.delete_one({"_id": candidate_id})  # Clean up
 
 # Election Management
-
-def clean_date_string(date_str):
-    # Remove the weekday and the 'GMT' part of the date string
-    # Example: 'Thu, 12 Dec 2024 11:53:00 GMT' -> '2024-12-12T11:53:00.000Z'
-    try:
-        date_str = date_str.split(', ')[1]  # Remove the weekday part
-        date_str = date_str.split(' GMT')[0]  # Remove ' GMT' part
-        date_str = f"{date_str}Z"  # Add the 'Z' to represent UTC timezone
-        return isoparse(date_str)  # Now parse it using isoparse
-    except Exception as e:
-        print(f"Error in cleaning date string: {e}")
-        return None
-
 def test_create_election(client):
     client, mongo = client  # Get client and mongo from fixture
     candidate_id = mongo.db.candidates.insert_one({

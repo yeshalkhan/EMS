@@ -12,15 +12,20 @@ from dateutil.parser import isoparse
 from datetime import datetime
 
 def clean_date_string(date_str):
-    # Remove the weekday part (e.g., 'Thu, ') and ' GMT' suffix
+    # Strip off the weekday (e.g., 'Thu, ') and ' GMT' part of the date string
     try:
-        # Remove the weekday part by splitting the string at the comma and taking the second part
-        date_str = date_str.split(', ')[1]  
+        # First, remove the weekday by splitting the string at the comma and taking the second part
+        date_str = date_str.split(', ')[1]  # e.g. "12 Dec 2024 11:53:00 GMT"
+        
         # Remove ' GMT' from the string to make it compatible with isoparse
-        date_str = date_str.replace(' GMT', '')  
-        # Add 'Z' at the end to indicate the UTC timezone
-        date_str = f"{date_str}Z"  
-        return isoparse(date_str)  # Parse the cleaned-up string into a datetime object
+        date_str = date_str.replace(' GMT', '')  # e.g. "12 Dec 2024 11:53:00"
+        
+        # Now, we are left with the proper format: "12 Dec 2024 11:53:00"
+        # Ensure the string is in the proper ISO 8601 format by appending 'Z' to represent UTC
+        date_str = f"{date_str}Z"  # Now it's like "12 Dec 2024 11:53:00Z"
+        
+        # Parse the cleaned string into a datetime object using isoparse
+        return isoparse(date_str)  # This will correctly parse the datetime string
     except Exception as e:
         print(f"Error in cleaning date string: {e}")
         return None
@@ -167,7 +172,7 @@ def test_get_candidates(client):
     assert response.json['success'] == True
     mongo.db.candidates.delete_one({"_id": candidate_id})  # Clean up
 
-# Election Management
+# Election management
 def test_create_election(client):
     client, mongo = client  # Get client and mongo from fixture
     candidate_id = mongo.db.candidates.insert_one({
@@ -244,3 +249,4 @@ def test_edit_election(client):
         # Clean up the test data after assertions
         mongo.db.elections.delete_one({"_id": election_id})  # Delete the election
         mongo.db.candidates.delete_one({"_id": candidate_id})  # Clean up candidate
+

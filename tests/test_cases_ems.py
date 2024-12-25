@@ -10,25 +10,6 @@ from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
 from dateutil.parser import isoparse
 from datetime import datetime
-
-def clean_date_string(date_str):
-    # Strip off the weekday (e.g., 'Thu, ') and ' GMT' part of the date string
-    try:
-        # First, remove the weekday by splitting the string at the comma and taking the second part
-        date_str = date_str.split(', ')[1]  # e.g. "12 Dec 2024 11:53:00 GMT"
-        
-        # Remove ' GMT' from the string to make it compatible with isoparse
-        date_str = date_str.replace(' GMT', '')  # e.g. "12 Dec 2024 11:53:00"
-        
-        # Now, we are left with the proper format: "12 Dec 2024 11:53:00"
-        # Ensure the string is in the proper ISO 8601 format by appending 'Z' to represent UTC
-        date_str = f"{date_str}Z"  # Now it's like "12 Dec 2024 11:53:00Z"
-        
-        # Parse the cleaned string into a datetime object using isoparse
-        return isoparse(date_str)  # This will correctly parse the datetime string
-    except Exception as e:
-        print(f"Error in cleaning date string: {e}")
-        return None
     
 # Create a fixture to initialize the Flask app and MongoDB
 @pytest.fixture
@@ -173,6 +154,8 @@ def test_get_candidates(client):
     mongo.db.candidates.delete_one({"_id": candidate_id})  # Clean up
 
 # Election management
+from datetime import datetime
+
 def test_create_election(client):
     client, mongo = client  # Get client and mongo from fixture
     candidate_id = mongo.db.candidates.insert_one({
@@ -188,14 +171,14 @@ def test_create_election(client):
     # Clean up: Ensure no conflicting elections exist
     mongo.db.elections.delete_many({})
 
-    # Clean up and convert the date to ISO 8601 format first
-    start_date = clean_date_string("Thu, 12 Dec 2024 11:53:00 GMT")
-    end_date = clean_date_string("Thu, 24 Dec 2024 01:54:00 GMT")
+    # Use simple date format 'YYYY-MM-DD HH:MM:SS' for start and end dates
+    start_date = "2024-12-12 11:53:00"
+    end_date = "2024-12-24 01:54:00"
 
     response = client.post('/create_election', json={
         "name": "pti election",
-        "start_date": start_date,  # Now passed as a datetime object
-        "end_date": end_date,  # Now passed as a datetime object
+        "start_date": start_date,  # Passed as a string in 'YYYY-MM-DD HH:MM:SS' format
+        "end_date": end_date,  # Passed as a string in 'YYYY-MM-DD HH:MM:SS' format
         "candidate_ids": [str(candidate_id)]
     })
     print("Create election response:", response.json)
@@ -217,8 +200,8 @@ def test_edit_election(client):
     # Insert an election
     election_id = mongo.db.elections.insert_one({
         "name": "pti election",
-        "start_date": clean_date_string("Thu, 12 Dec 2024 11:53:00 GMT"),
-        "end_date": clean_date_string("Thu, 24 Dec 2024 01:54:00 GMT"),
+        "start_date": "2024-12-12 11:53:00",  # Simple date string without weekday and timezone
+        "end_date": "2024-12-24 01:54:00",  # Simple date string without weekday and timezone
         "candidates": [{"_id": candidate_id, "name": "alizay", "party": "A"}],
         "votes": {}
     }).inserted_id
@@ -231,8 +214,8 @@ def test_edit_election(client):
     assert election is not None, "Election was not found in the database before edit."
 
     # Attempt to edit the election
-    start_date = clean_date_string("Thu, 12 Dec 2024 11:53:00 GMT")
-    end_date = clean_date_string("Thu, 24 Dec 2024 01:54:00 GMT")
+    start_date = "2024-12-12 11:53:00"  # Simple date string without weekday and timezone
+    end_date = "2024-12-24 01:54:00"  # Simple date string without weekday and timezone
 
     try:
         response = client.put(f'/edit_election/{str(election_id)}', json={
@@ -249,4 +232,3 @@ def test_edit_election(client):
         # Clean up the test data after assertions
         mongo.db.elections.delete_one({"_id": election_id})  # Delete the election
         mongo.db.candidates.delete_one({"_id": candidate_id})  # Clean up candidate
-

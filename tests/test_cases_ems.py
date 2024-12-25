@@ -9,7 +9,6 @@ from datetime import datetime
 from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
 
-# Create a fixture to initialize the Flask app and MongoDB
 @pytest.fixture
 def client():
     app.config['TESTING'] = True

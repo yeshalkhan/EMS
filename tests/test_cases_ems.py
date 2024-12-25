@@ -124,7 +124,7 @@ def test_add_candidate(client):
     response = client.post('/add_candidate', json={
         "name": "alizay",
         "party": "A",
-        "cnic": "55555",
+        "cnic": "66666",
         "dob": "1990-01-01"
     })
 
@@ -134,7 +134,7 @@ def test_add_candidate(client):
     assert response.json['success'] == True
 
     # Clean up: remove candidate after the test
-    mongo.db.candidates.delete_one({"cnic": "55555"})
+    mongo.db.candidates.delete_one({"cnic": "66666"})
 
 def test_get_candidates(client):
     client, mongo = client  # Get client and mongo from fixture
@@ -142,7 +142,7 @@ def test_get_candidates(client):
     candidate_id = mongo.db.candidates.insert_one({
         "name": "alizay",
         "party": "A",
-        "cnic": "55555",
+        "cnic": "66666",
         "dob": "1990-01-01"
     }).inserted_id
     with client.session_transaction() as sess:
@@ -158,7 +158,7 @@ def test_create_election(client):
     candidate_id = mongo.db.candidates.insert_one({
         "name": "alizay",
         "party": "A",
-        "cnic": "55555",
+        "cnic": "66666",
         "dob": "1990-01-01"
     }).inserted_id
 
@@ -168,16 +168,20 @@ def test_create_election(client):
     # Clean up: Ensure no conflicting elections exist
     mongo.db.elections.delete_many({})
 
-    response = client.post('/create_election', json={
-        "name": "pti election",
-        "start_date": isoparse("2024-12-12T11:53:00.000Z"),  # Use isoparse here
-        "end_date": isoparse("2024-12-24T01:54:00.000Z"),  # Use isoparse here
-        "candidate_ids": [str(candidate_id)]
-    })
-    print("Create election response:", response.json)
-    assert response.json['success'] == True
-    mongo.db.elections.delete_one({"name": "pti election"})  # Clean up
-    mongo.db.candidates.delete_one({"_id": candidate_id})  # Clean up
+    try:
+        response = client.post('/create_election', json={
+            "name": "pti election",
+            "start_date": isoparse("2024-12-12T11:53:00.000Z"),  # Correct date format
+            "end_date": isoparse("2024-12-24T01:54:00.000Z"),  # Correct date format
+            "candidate_ids": [str(candidate_id)]
+        })
+        print("Create election response:", response.json)
+        assert response.json['success'] == True
+    finally:
+        # Clean up the test data after assertions to ensure no data is left
+        mongo.db.elections.delete_one({"name": "pti election"})
+        mongo.db.candidates.delete_one({"_id": candidate_id})  # Clean up candidate
+
 
 def test_edit_election(client):
     client, mongo = client  # Get client and mongo from fixture
@@ -186,15 +190,15 @@ def test_edit_election(client):
     candidate_id = mongo.db.candidates.insert_one({
         "name": "alizay",
         "party": "A",
-        "cnic": "55555",
+        "cnic": "66666",
         "dob": "1990-01-01"
     }).inserted_id
 
     # Insert an election
     election_id = mongo.db.elections.insert_one({
         "name": "pti election",
-        "start_date": isoparse("2024-12-12T11:53:00.000Z"),  # Use isoparse here
-        "end_date": isoparse("2024-12-24T01:54:00.000Z"),  # Use isoparse here
+        "start_date": isoparse("2024-12-12T11:53:00.000Z"),  # Correct format for start_date
+        "end_date": isoparse("2024-12-24T01:54:00.000Z"),  # Correct format for end_date
         "candidates": [{"_id": candidate_id, "name": "alizay", "party": "A"}],
         "votes": {}
     }).inserted_id
@@ -202,23 +206,25 @@ def test_edit_election(client):
     with client.session_transaction() as sess:
         sess['user'] = {"id": "admin123", "role": "admin"}
 
-    # No deletion, just ensuring that the election exists
     # Ensure the election exists before attempting to edit it
     election = mongo.db.elections.find_one({"_id": election_id})
     assert election is not None, "Election was not found in the database before edit."
 
-    # Attempt to edit the election
-    response = client.put(f'/edit_election/{str(election_id)}', json={
-        "name": "updated election",
-        "start_date": isoparse("2024-12-12T11:53:00.000Z"),  # Use isoparse here
-        "end_date": isoparse("2024-12-24T01:54:00.000Z"),  # Use isoparse here
-        "candidate_ids": [str(candidate_id)]
-    })
-    print("Edit election response:", response.json)
+    # Attempt to edit the election with new data
+    try:
+        response = client.put(f'/edit_election/{str(election_id)}', json={
+            "name": "updated election",
+            "start_date": isoparse("2024-12-12T11:53:00.000Z"),  # Correct format for start_date
+            "end_date": isoparse("2024-12-24T01:54:00.000Z"),  # Correct format for end_date
+            "candidate_ids": [str(candidate_id)]  # Make sure the candidate ID is passed as a string
+        })
+        print("Edit election response:", response.json)
 
-    # Assert that the response indicates success
-    assert response.json['success'] == True
+        # Assert that the response indicates success
+        assert response.json['success'] == True
 
-    # Clean up the test data
-    mongo.db.elections.delete_one({"_id": election_id})
-    mongo.db.candidates.delete_one({"_id": candidate_id})
+    finally:
+        # Clean up the test data after assertions
+        mongo.db.elections.delete_one({"_id": election_id})  # Delete the election
+        mongo.db.candidates.delete_one({"_id": candidate_id})  # Clean up candidate
+

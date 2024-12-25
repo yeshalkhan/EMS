@@ -55,9 +55,3 @@ These stages are defined in the `Jenkinsfile` located at the root of the reposit
 ## Additional Information
 
 For more detailed information on setting up and managing Jenkins pipelines, refer to the [Jenkins documentation](https://www.jenkins.io/doc/).
-
----
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

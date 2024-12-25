@@ -95,12 +95,13 @@ def test_register_voter(client):
         sess['user'] = {"id": "admin123", "role": "admin"}
     response = client.post('/register_voter', json={
         "name": "John Doe",
-        "cnic": "12345",
+        # "cnic": "12345",
+        "cnic": "11111",
         "dob": "2000-01-01"
     })
     print("Register response:", response.json)
     assert response.json['success'] == True
-    mongo.db.voters.delete_one({"cnic": "12345"})  # Clean up
+    mongo.db.voters.delete_one({"cnic": "11111"})  # Clean up
 
 def test_add_candidate(client):
     client, mongo = client  # Get client and mongo from fixture
@@ -110,10 +111,20 @@ def test_add_candidate(client):
 
 
     # Add new candidate
+
+    # Failed test:
+    '''
     response = client.post('/add_candidate', json={
         "name": "alizay",
         "party": "A",
         "cnic": "67890",
+        "dob": "1990-01-01"
+    })
+    '''
+    response = client.post('/add_candidate', json={
+        "name": "alizay",
+        "party": "A",
+        "cnic": "55555",
         "dob": "1990-01-01"
     })
 
@@ -123,8 +134,7 @@ def test_add_candidate(client):
     assert response.json['success'] == True
 
     # Clean up: remove candidate after the test
-    mongo.db.candidates.delete_one({"cnic": "67890"})
-
+    mongo.db.candidates.delete_one({"cnic": "55555"})
 
 def test_get_candidates(client):
     client, mongo = client  # Get client and mongo from fixture
@@ -160,8 +170,8 @@ def test_create_election(client):
 
     response = client.post('/create_election', json={
         "name": "pti election",
-        "start_date": "2024-12-12T11:53:00.000Z",
-        "end_date": "2024-12-24T01:54:00.000Z",
+         "start_date": isoparse("2024-12-12T11:53:00.000Z"),  # Use isoparse here
+        "end_date": isoparse("2024-12-24T01:54:00.000Z"),  # Use isoparse here
         "candidate_ids": [str(candidate_id)]
     })
     print("Create election response:", response.json)
@@ -200,8 +210,8 @@ def test_edit_election(client):
     # Attempt to edit the election
     response = client.put(f'/edit_election/{str(election_id)}', json={
         "name": "updated election",
-        "start_date": "2024-12-12T11:53:00.000Z",
-        "end_date": "2024-12-24T01:54:00.000Z",
+        "start_date": isoparse("2024-12-12T11:53:00.000Z"),  # Use isoparse here
+        "end_date": isoparse("2024-12-24T01:54:00.000Z"),  # Use isoparse here
         "candidate_ids": [str(candidate_id)]
     })
     print("Edit election response:", response.json)

@@ -22,7 +22,7 @@ pipeline {
 
 	stage('Test') {
     	    steps {
-       		bat 'set PYTHONPATH=%cd%\\src && "C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37\\python.exe" -m pytest tests/'
+       		bat 'set PYTHONPATH=%cd%\\src && "C:\\Users\\computer point\\AppData\\Local\\Programs\\Python\\Python37\\python.exe" -m pytest src/'
     	    }
 	}
     }

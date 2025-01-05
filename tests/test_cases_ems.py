@@ -10,13 +10,14 @@ from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
     
 load_dotenv()
+print(f"MONGO_URI app: {os.getenv('MONGO_URI')}")
 
 # Create a fixture to initialize the Flask app and MongoDB
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
     app.config['SECRET_KEY'] = 'test_secret_key'
-    app.config["MONGO_URI"] = "mongodb+srv://bsef21m009:L12W4R6Q6F1wRhCh@cluster0.rwzex.mongodb.net/evote"
+    app.config["MONGO_URI"] = os.getenv("MONGO_URI")
     app.config["MONGO_DBNAME"] = "test"  # Use the test database
     mongo = PyMongo(app)  # Initialize PyMongo here
 

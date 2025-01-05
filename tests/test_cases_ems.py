@@ -18,7 +18,7 @@ def client():
     app.config['TESTING'] = True
     app.config['SECRET_KEY'] = 'test_secret_key'
     app.config["MONGO_URI"] = os.getenv("MONGO_URI")
-    app.config["MONGO_DBNAME"] = "test"  # Use the test database
+    app.config["MONGO_DBNAME"] = "evote"  # Use the test database
     mongo = PyMongo(app)  # Initialize PyMongo here
 
     with app.test_client() as client:

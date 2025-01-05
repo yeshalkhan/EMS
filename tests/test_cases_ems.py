@@ -14,7 +14,7 @@ from flask_pymongo import PyMongo
 def client():
     app.config['TESTING'] = True
     app.config['SECRET_KEY'] = 'test_secret_key'
-    app.config["MONGO_URI"] = "mongodb+srv://bsef21m009:DcVFS1Pa0TaS3aFV@cluster0.rwzex.mongodb.net/evote"
+    app.config["MONGO_URI"] = os.getenv("MONGO_URI")
     app.config["MONGO_DBNAME"] = "test"  # Use the test database
     mongo = PyMongo(app)  # Initialize PyMongo here
 

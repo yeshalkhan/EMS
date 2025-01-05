@@ -1,6 +1,7 @@
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
+from dotenv import load_dotenv
 
 from app import app, format_response, login_required, admin_required
 import pytest

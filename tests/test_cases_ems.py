@@ -2,7 +2,6 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 from dotenv import load_dotenv
-
 from app import app, format_response, login_required, admin_required
 import pytest
 from flask import session
@@ -10,6 +9,8 @@ from datetime import datetime
 from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
     
+load_dotenv()
+
 # Create a fixture to initialize the Flask app and MongoDB
 @pytest.fixture
 def client():

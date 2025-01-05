@@ -3,16 +3,30 @@ from flask_pymongo import PyMongo
 from datetime import datetime
 from functools import wraps
 from bson.objectid import ObjectId
-from dateutil.parser import isoparse
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
 # Configure MongoDB
-app.config["MONGO_URI"] = "mongodb+srv://bsef21m009:DcVFS1Pa0TaS3aFV@cluster0.rwzex.mongodb.net/evote"
+app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 app.config["MONGO_DBNAME"] = "evote"
 mongo = PyMongo(app)
 
+# Initialize admin user
+# @app.before_first_request
+# def create_admin():
+#     if not mongo.db.admins.find_one({"cnic": "admin_cnic"}):
+#         mongo.db.admins.insert_one({
+#             "admin_id": "admin",
+#             "name": "Admin",
+#             "cnic": "admin_cnic",
+#             "dob": "1970-01-01"
+#         })
+        
 def format_response(success, message, data=None):
     return jsonify({"success": success, "message": message, "data": data})
 
@@ -43,8 +57,9 @@ def login():
     if user:
         session['user'] = {"id": user['cnic'], "role": "voter"}
         return format_response(True, "Login successful", {"role": "voter"})
-    
+
     admin = mongo.db.admins.find_one({"cnic": cnic, "dob": dob})
+
     if admin:
         session['user'] = {"id": admin['admin_id'], "role": "admin"}
         return format_response(True, "Login successful", {"role": "admin"})
@@ -110,8 +125,8 @@ def get_candidates():
 def create_election():
     data = request.json
     name = data.get('name')
-    start_date = isoparse(data.get('start_date'))  # Use isoparse here
-    end_date = isoparse(data.get('end_date'))  # Use isoparse here
+    start_date = datetime.fromisoformat(data.get('start_date'))
+    end_date = datetime.fromisoformat(data.get('end_date'))
     candidate_ids = data.get('candidate_ids')
 
     if start_date >= end_date:
@@ -148,8 +163,8 @@ def create_election():
 def edit_election(election_id):
     data = request.json
     name = data.get('name')
-    start_date = isoparse(data.get('start_date'))  # Use isoparse here
-    end_date = isoparse(data.get('end_date'))  # Use isoparse here
+    start_date = datetime.fromisoformat(data.get('start_date'))
+    end_date = datetime.fromisoformat(data.get('end_date'))
     candidate_ids = data.get('candidate_ids')
 
     if start_date >= end_date:
@@ -255,6 +270,7 @@ def get_results(election_id):
             "party": candidate['party'],
             "votes": candidate_votes
         })
+
 
     max_votes = max(results, key=lambda x: x['votes'])['votes']
     winners = [candidate for candidate in results if candidate['votes'] == max_votes]

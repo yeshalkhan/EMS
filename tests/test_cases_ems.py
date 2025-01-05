@@ -20,6 +20,7 @@ def client():
     app.config["MONGO_URI"] = os.getenv("MONGO_URI")
     app.config["MONGO_DBNAME"] = "evote"  # Use the test database
     mongo = PyMongo(app)  # Initialize PyMongo here
+    print(f"MONGO_URI test: {os.getenv('MONGO_URI')}")
 
     with app.test_client() as client:
         with app.app_context():

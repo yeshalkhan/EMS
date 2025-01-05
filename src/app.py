@@ -15,6 +15,7 @@ app.secret_key = 'your_secret_key'
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 app.config["MONGO_DBNAME"] = "evote"
 mongo = PyMongo(app)
+print(f"MONGO_URI app: {os.getenv('MONGO_URI')}")
 
 # Initialize admin user
 # @app.before_first_request

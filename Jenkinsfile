@@ -3,12 +3,14 @@ pipeline {
 
     environment {
         GITHUB_CREDENTIALS = credentials('my-repo-credentials')
+	MONGO_URI = credentials('my-env-credentials')  
     }
 
     stages {
         stage('Checkout') {
             steps {
                 git credentialsId: 'my-repo-credentials', url: 'https://github.com/yeshalkhan/EMS', branch: 'main'
+		echo "MONGO_URI: ${env.MONGO_URI}"
             }
         }
 

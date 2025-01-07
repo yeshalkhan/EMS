@@ -10,7 +10,6 @@ from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
     
 load_dotenv()
-print(f"MONGO_URI app: {os.getenv('MONGO_URI')}")
 
 # Create a fixture to initialize the Flask app and MongoDB
 @pytest.fixture
